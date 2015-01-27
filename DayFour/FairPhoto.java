@@ -76,35 +76,44 @@ public class FairPhoto implements Comparator<FairPhoto.CowPosition>{
 	}
 	
 	private int calculateCowRange(List<CowPosition> cows) {
-		int startIndex = 0;
-		int lastIndex = cows.size()-1;
-		while(startIndex < lastIndex) {			
-			if (isValidRange(startIndex, lastIndex)) {
-				return cows.get(lastIndex).position - cows.get(startIndex).position;
+		int maxRange = 0;
+		int maxStartIndex = 0;
+		int maxLastIndex = 0;
+		
+		for (int i = 0; i < cows.size() - 1; i++) {
+			total[0] = 0;
+			total[1] = 0;
+			total[cows.get(i).color.getValue()]++; 
+			total[cows.get(i+1).color.getValue()]++;
+			for (int j = i+1; j <= cows.size()-1; ) {
+				if (isValidRange(i, j, total[0], total[1])) {
+					int range = cows.get(j).position - cows.get(i).position;
+					if (range > maxRange) {
+						maxRange = range;
+						maxStartIndex = i;
+						maxLastIndex = j;
+					}
+				}
+				j = j+2;
+				if (j < cows.size()) {
+					total[cows.get(j-1).color.getValue()]++;
+					total[cows.get(j).color.getValue()]++;
+				}
 			}
-			int range1 = 0;
-			int range2 = 0;
-			total[cows.get(startIndex).color.getValue()]--;
-			if (isValidRange(startIndex+1, lastIndex)) {
-				range1 = cows.get(lastIndex).position - cows.get(startIndex+1).position;
-			} 
-			total[cows.get(lastIndex).color.getValue()]--;
-			if (isValidRange(startIndex, lastIndex-1)){
-				range2 = cows.get(lastIndex-1).position - cows.get(startIndex).position;
-			}
-			if (range1 != 0 || range2 != 0) {
-				return range1>range2 ? range1: range2; 
-			}
-			startIndex = startIndex + 1;
-			lastIndex = lastIndex - 1;
 		}
-		return 0;
+		if (maxRange != 0) {
+			System.out.println("start: " + cows.get(maxStartIndex).position + " end: " + cows.get(maxLastIndex).position);
+		}
+		return maxRange;
 	}
 
-	private boolean isValidRange(int startIndex, int lastIndex) {
+	private boolean isValidRange(int startIndex, int lastIndex, int numberOfWhite, int numberOfSpotted) {
 		if ((lastIndex-startIndex+1)%2 == 1)
 			return false;
-		if (total[Color.S.getValue()] > total[Color.W.getValue()]) {
+		if (numberOfSpotted > numberOfWhite) {
+			return false;
+		}
+		if ((numberOfWhite - numberOfSpotted)%2 == 1){
 			return false;
 		}
 		return true;
