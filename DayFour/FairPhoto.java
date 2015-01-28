@@ -43,6 +43,10 @@ public class FairPhoto implements Comparator<FairPhoto.CowPosition>{
 		total[1] = 0;
 	}
 	
+	public void setFile(String fileName) {
+		this.fileName = fileName;
+	}
+	
 	public int calulateMaxRange() {
 		List<CowPosition> cows = loadFile();
 		Collections.sort(cows, this);
@@ -80,25 +84,25 @@ public class FairPhoto implements Comparator<FairPhoto.CowPosition>{
 		int maxStartIndex = 0;
 		int maxLastIndex = 0;
 		
+		int[] tempTotal = {total[0], total[1]};
+		
 		for (int i = 0; i < cows.size() - 1; i++) {
-			total[0] = 0;
-			total[1] = 0;
-			total[cows.get(i).color.getValue()]++; 
-			total[cows.get(i+1).color.getValue()]++;
-			for (int j = i+1; j <= cows.size()-1; ) {
+			tempTotal[0] = total[0];
+			tempTotal[1] = total[1];
+			for (int j = cows.size()-1; j >i; j--) {
 				if (isValidRange(i, j, total[0], total[1])) {
 					int range = cows.get(j).position - cows.get(i).position;
 					if (range > maxRange) {
 						maxRange = range;
 						maxStartIndex = i;
 						maxLastIndex = j;
+						break;
 					}
 				}
-				j = j+2;
-				if (j < cows.size()) {
-					total[cows.get(j-1).color.getValue()]++;
-					total[cows.get(j).color.getValue()]++;
-				}
+				tempTotal[cows.get(j-1).color.getValue()]--;
+			}
+			if (i < cows.size() -2) {
+				total[cows.get(i).color.getValue()]--;
 			}
 		}
 		if (maxRange != 0) {
@@ -113,9 +117,6 @@ public class FairPhoto implements Comparator<FairPhoto.CowPosition>{
 		if (numberOfSpotted > numberOfWhite) {
 			return false;
 		}
-		if ((numberOfWhite - numberOfSpotted)%2 == 1){
-			return false;
-		}
 		return true;
 	}
 	
@@ -126,6 +127,12 @@ public class FairPhoto implements Comparator<FairPhoto.CowPosition>{
 	
 	public static void main(String[] argvs) {
 		FairPhoto fairPhoto = new FairPhoto("input.txt");
+		System.out.println(fairPhoto.calulateMaxRange());
+		fairPhoto.setFile("input1.txt");
+		System.out.println(fairPhoto.calulateMaxRange());
+		fairPhoto.setFile("input2.txt");
+		System.out.println(fairPhoto.calulateMaxRange());
+		fairPhoto.setFile("input3.txt");
 		System.out.println(fairPhoto.calulateMaxRange());
 	}
 }
