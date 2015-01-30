@@ -78,3 +78,6 @@ https://oj.leetcode.com/problems/fraction-to-recurring-decimal/
 
 1/28/2015
 https://oj.leetcode.com/problems/find-peak-element/
+
+1/29/2015
+https://oj.leetcode.com/problems/max-points-on-a-line/
